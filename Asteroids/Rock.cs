@@ -14,7 +14,7 @@ namespace Asteroids
     class Rock : GameSprite
     {
 
-        static Random rand = new Random();
+        private static Random rand = new Random();
         private int speed;
         private double angle;
 
@@ -33,12 +33,45 @@ namespace Asteroids
 
         public override void Update()
         {
-            //move rocks
             drawRectangle.X += (int)velocity.X;
             drawRectangle.Y += (int)velocity.Y;
 
             BounceTopBottom();
             BounceLeftRight();
+        }
+
+        private void BounceTopBottom()
+        {
+            if (drawRectangle.Y < 0)
+            {
+                //Bounce off top
+                drawRectangle.Y = 0;
+                velocity.Y *= -1;
+            }
+
+            else if ((drawRectangle.Y + drawRectangle.Height) > windowHeight)
+            {
+                //Bounce off bottom
+                drawRectangle.Y = windowHeight - drawRectangle.Height;
+                velocity.Y *= -1;
+            }
+        }
+
+        private void BounceLeftRight()
+        {
+            if (drawRectangle.X < 0)
+            {
+                //Bounce off left
+                drawRectangle.X = 0;
+                velocity.X *= -1;
+            }
+
+            else if ((drawRectangle.X + drawRectangle.Width) > windowWidth)
+            {
+                //Bounce off left
+                drawRectangle.X = windowWidth - drawRectangle.Width;
+                velocity.X *= -1;
+            }
         }
     }
 }

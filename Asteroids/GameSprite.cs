@@ -48,43 +48,46 @@ namespace Asteroids
             return this.velocity;
         }
 
-        protected void BounceTopBottom()
+        public bool Collision(GameSprite gs)
         {
-            if (drawRectangle.Y < 0)
+            if (this.drawRectangle.Intersects(gs.GetRect()))
             {
-                //Bounce off top
-                drawRectangle.Y = 0;
-                velocity.Y *= -1;
+                return true;
             }
-
-            else if ((drawRectangle.Y + drawRectangle.Height) > windowHeight)
-            {
-                //Bounce off bottom
-                drawRectangle.Y = windowHeight - drawRectangle.Height;
-                velocity.Y *= -1;
-            }
+            return false;
         }
 
-        protected void BounceLeftRight()
+        public Rectangle GetRect()
         {
-            if (drawRectangle.X < 0)
-            {
-                //Bounce off left
-                drawRectangle.X = 0;
-                velocity.X *= -1;
-            }
+            return this.drawRectangle;
+        }     
+        
+        public Vector2 GetVelocity()
+        {
+            return this.velocity;
+        } 
 
-            else if ((drawRectangle.X + drawRectangle.Width) > windowWidth)
-            {
-                //Bounce off left
-                drawRectangle.X = windowWidth - drawRectangle.Width;
-                velocity.X *= -1;
-            }
+        public int GetXVel()
+        {
+            return (int)velocity.X;
+        }
+        
+        public int GetYVel()
+        {
+            return (int)velocity.Y;
         }
 
-        public bool IsAbsorbed()
+        public void SetVelocity(int xVel, int yVel)
         {
-            return (drawRectangle.X < 0 || drawRectangle.Y < 0 || drawRectangle.X > GameConstants.WindowWidth || drawRectangle.Y > GameConstants.WindowHeight);
+            velocity.X = xVel;
+            velocity.Y = yVel;
         }
+
+        public void SetVelocity(Vector2 velocity)
+        {
+            this.velocity = velocity;
+        }
+
+
     }
 }

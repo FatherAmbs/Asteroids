@@ -11,5 +11,8 @@ namespace Asteroids
 
         public const int WindowWidth = 800;
         public const int WindowHeight = 600;
+
+        public const int RockCount = 50;
+        public const int LaserCount = 5;
     }
 }

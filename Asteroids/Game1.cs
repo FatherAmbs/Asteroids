@@ -14,13 +14,14 @@ namespace Asteroids
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Ship ship;
 
+        Ship ship;
         List<Rock> rockList;
         List<Laser> laserList;
+
         private double rockTimer = 0;
 
-        Random rand;
+        private static int score;
 
         public Game1()
         {
@@ -30,7 +31,7 @@ namespace Asteroids
             graphics.PreferredBackBufferHeight = GameConstants.WindowHeight;
             graphics.PreferredBackBufferWidth = GameConstants.WindowWidth;
 
-            rand = new Random();
+            score = 0;
         }
 
         /// <summary>
@@ -77,23 +78,29 @@ namespace Asteroids
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            // TODO: Add your update logic here
             rockTimer += gameTime.ElapsedGameTime.TotalMilliseconds;
-            System.Diagnostics.Debug.WriteLine("Game Time: " + gameTime.ElapsedGameTime.TotalMilliseconds + ", Rock Timer: " + rockTimer);
-
+            Console.WriteLine("Score: " + score);
             if (rockTimer > 1000)
             {
                 rockTimer = 0;
-                if (rockList.Count < 50)
+                if (rockList.Count < GameConstants.RockCount)
                 {
-                    SpawnRock();
-                    
+                    rockList.Add(Logic.SpawnRock(Content));
                 }
             }
-            // TODO: Add your update logic here
-            UpdateRocks();
-            ship.Update();
-            UpdateLasers(ship);
 
+            for (int i = rockList.Count - 1; i >= 0; i--)
+            {
+                rockList[i].Update();
+            }
+            ship.Update();
+            Logic.UpdateLasers(Content, ship, laserList);
+            if (Logic.CollisionCheck(laserList, rockList, ship))
+            {
+                Console.WriteLine("You lose!");
+                Exit();
+            }
             base.Update(gameTime);
         }
 
@@ -120,72 +127,9 @@ namespace Asteroids
             base.Draw(gameTime);
         }
 
-        private void UpdateLasers(Ship ship)
+        public static void IncreaseScore()
         {
-            if (ship.HasFired())
-            {
-                if (laserList.Count < 5)
-                {
-                    laserList.Add(new Laser(Content, @"graphics\laser", ship.GetX(), ship.GetY(),
-                        GameConstants.WindowWidth, GameConstants.WindowHeight, ship.GetAngle()));
-                }
-               
-            }
-            for (int i = laserList.Count - 1; i >= 0; i--)
-            {
-                laserList[i].Update();
-                if (laserList[i].IsAbsorbed())
-                {
-                    laserList.RemoveAt(i);
-                }
-            }
+            score++;
         }
-
-      
-        private void UpdateRocks()
-        {
-            for (int i = rockList.Count - 1; i >= 0; i--)
-            {
-                rockList[i].Update();
-            }
-        }
-        private Vector2 RockStart()
-        {
-            int startingWall = rand.Next(4);
-            Vector2 rockPosition = new Vector2(0, 0);
-            switch (startingWall)
-            {
-                case 0:
-                    //Left wall
-                    rockPosition.X = 0;
-                    rockPosition.Y = rand.Next(GameConstants.WindowHeight);
-                    break;
-                case 1:
-                    //Top wall
-                    rockPosition.X = rand.Next(GameConstants.WindowWidth);
-                    rockPosition.Y = 0;
-                    break;
-                case 2:
-                    //Right wall
-                    rockPosition.X = GameConstants.WindowWidth;
-                    rockPosition.Y = rand.Next(GameConstants.WindowHeight);
-                    break;
-                case 4:
-                    //Bottom wall
-                    rockPosition.X = rand.Next(GameConstants.WindowWidth);
-                    rockPosition.Y = GameConstants.WindowHeight;
-                    break;
-            }
-            return rockPosition;
-        }
-
-        private void SpawnRock()
-        {
-            Vector2 rockPosition = RockStart();
-            rockList.Add(new Rock(Content, @"graphics\rock",
-                            (int)rockPosition.X, (int)rockPosition.Y,
-                            rand.Next(5) + 2, 2 * Math.PI * rand.NextDouble(),
-                            GameConstants.WindowWidth, GameConstants.WindowHeight));
-        }
-    }    
+    }
 }
